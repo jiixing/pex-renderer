@@ -51,7 +51,7 @@
       ? ""
       : '<div class="Examples-list-item"><a href="/"><h3>home</h3></a></div>',
   );
-
+  id = "skybox"
   if (id) {
     document.querySelector(".MainHeader").remove();
     document.querySelector("body").style.backgroundColor = getComputedStyle(
@@ -59,7 +59,7 @@
     ).getPropertyValue("--color-grey");
 
     try {
-      await importShim(`./examples/${id}.js`);
+      await import(`./skybox.js`);//[hack]
     } catch (error) {
       console.error(error);
     }

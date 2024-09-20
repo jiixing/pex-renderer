@@ -80,53 +80,7 @@
       .MainContent {
         background-color: var(--color-blue-5);
       }
-      .Examples-list {
-        grid-template-columns: repeat(3, 1fr);
-        font-family: var(--font-heading);
-      }
-      .Examples-list::after {
-        content: "";
-      }
-      .Examples-list-item a {
-        display: block;
-        color: var(--color-black);
-        text-decoration: none;
-        text-transform: capitalize;
-      }
-      .Examples-list-item img {
-        max-width: 100%;
-      }
-      .Examples-list-item h3 {
-        margin: 10px 0;
-      }
-      .Examples-list--side {
-        display: block;
-        overflow: auto;
-        padding: 0 20px;
-        z-index: 9999;
-        position: fixed;
-        right: 0;
-        height: 100%;
-        background-color: var(--color-blue-5-rgba);
-        transform: translate3d(90%, 0, 0);
-        transition: transform 150ms ease-out;
-      }
-      .Examples-list--side:hover {
-        transform: translate3d(0, 0, 0);
-        transition: transform 150ms ease-in;
-      }
-      .Examples-list--side .Examples-list-item {
-        width: 100%;
-        max-width: 200px;
-        margin-bottom: 20px;
-        border-bottom: 1px solid var(--color-teal);
-      }
-      .Examples-list--side .Examples-list-item h3 {
-        font-size: 16px;
-      }
-      .Examples-list--side .Examples-list-item a {
-        color: var(--color-white);
-      }
+
       @media screen and (max-width: 768px) {
         .Examples-list {
           grid-template-columns: repeat(2, 1fr);
@@ -143,19 +97,14 @@
     </style>
   </head>
   <body>
-    <header class="MainHeader">
-      <div class="u-grid u-container">
-        <h1>PEX</h1>
-        <p>Examples</p>
-      </div>
-    </header>
+
     <main class="MainContent">
       <div class="u-container">
         <nav class="Examples-list u-grid"></nav>
         <div class="Example"></div>
       </div>
     </main>
-    <script src="./examples/basic.js" type="module"></script>
+    <script src="./examples/simple.js" type="module"></script>
     <!-- <script src="./examples/skybox.js" type="module"></script> -->
   </body>
 </html>

@@ -47,7 +47,9 @@
     "pex-math": "^4.1.1",
     "pex-random": "^2.1.2",
     "pex-shaders": "^1.0.0-alpha.33",
-    "snowdev": "^2.2.3"
+    "vite": "^5.0.8",
+    "vite-plugin-glsl": "^1.2.1",
+   "snowdev": "^2.2.3"
   },
   "devDependencies": {
     "@hpcc-js/wasm-graphviz": "^1.5.0",

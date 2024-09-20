@@ -2,6 +2,8 @@ import {
   systems,
   components,
   world as createWorld,
+  renderGraph as createRenderGraph,
+  resourceCache as createResourceCache,
   entity as createEntity,
 } from "../index.js";
 import createContext from "pex-context";
@@ -45,11 +47,11 @@ function rand() {
 const gradient = cosineGradient(scheme[0], scheme[1], scheme[2], scheme[3]);
 
 // Start
-const ctx = createContext({
-  type: "webgl",
-});
+const ctx = createContext();
 
 const world = createWorld();
+const resourceCache = createResourceCache(ctx);
+const renderGraph = createRenderGraph(ctx);
 
 function aabbToString(aabb) {
   if (!aabb) return "[]";
@@ -83,24 +85,14 @@ let debugOnce = false;
 
 // Camera
 const cameraEntity = createEntity({
-  // renderer.postProcessing({
-  //   ssao: true,
-  //   ssaoRadius: 4,
-  //   dof: true,
-  //   dofAperture: 1,
-  //   dofFocusDistance: 5,
-  //   fxaa: true,
-  // }),
-  transform: components.transform(),
+
+  transform: components.transform({position: [0, 5, 13]}),
   camera: components.camera({
     fov: Math.PI / 3,
     aspect: ctx.gl.drawingBufferWidth / ctx.gl.drawingBufferHeight,
-    exposure: 2,
   }),
-  orbiter: components.orbiter({
-    position: [0, 3, 8],
-    element: ctx.gl.canvas,
-  }),
+  orbiter: components.orbiter({element: ctx.gl.canvas}),
+
 });
 world.add(cameraEntity);
 
@@ -123,7 +115,7 @@ const floorEntity = createEntity({
 });
 world.add(floorEntity);
 
-let instanced = true;
+let instanced = false;
 const geom = cube({ sx: 0.2, sy: 0.5 + random.float(), sz: 0.2 });
 const offsets = [];
 const scales = [];
@@ -319,26 +311,64 @@ window.addEventListener("keydown", ({ key }) => {
   if (key === "d") debugOnce = true;
 });
 
-world.addSystem(systems.geometry({ ctx }));
-world.addSystem(systems.transform());
-world.addSystem(systems.camera());
-world.addSystem(systems.skybox({ ctx }));
-world.addSystem(systems.reflectionProbe({ ctx }));
-world.addSystem(systems.renderer({ ctx, outputEncoding: ctx.Encoding.Gamma }));
+const geometrySystem = systems.geometry({ctx});
+const transformSystem = systems.transform();
+const cameraSystem = systems.camera();
+const lightSystem = systems.light();
+
+/* TODO NOT YET
+world.addSystem(systems.skybox({ ctx,resourceCache}));
+world.addSystem(systems.reflectionProbe({ ctx,resourceCache }));
+*/
+const renderPipelineSystem = systems.renderPipeline({
+  ctx,
+  resourceCache,
+  renderGraph,
+  outputEncoding: ctx.Encoding.Linear,
+});
+const standardRendererSystem = systems.renderer.standard({
+  ctx,
+  resourceCache,
+  renderGraph,
+});
 
 let shadowMapPreview;
-
+const renderView = {
+  camera: cameraEntity.camera,
+  cameraEntity: cameraEntity,
+  viewport: [0, 0, ctx.gl.drawingBufferWidth, ctx.gl.drawingBufferHeight],
+};
 ctx.frame(() => {
-  ctx.debug(frameNumber++ === 1);
-  ctx.debug(debugOnce);
-  debugOnce = false;
-  world.update();
+  // ctx.debug(frameNumber++ === 1);
+  // ctx.debug(debugOnce);
 
+  debugOnce = false;
+ // world.update(); // this is obsolete as not all systems expect deltatime
+  resourceCache.beginFrame();
+  renderGraph.beginFrame();
+
+  // update to handle when window is resized
+  renderView.viewport[2] = ctx.gl.drawingBufferWidth
+  renderView.viewport[3] = ctx.gl.drawingBufferHeight
+
+  geometrySystem.update(world.entities);
+  transformSystem.update(world.entities);
+  cameraSystem.update(world.entities);
+  lightSystem.update(world.entities);
+  renderPipelineSystem.update(world.entities, {
+    renderers: [standardRendererSystem],
+    renderView,
+  });
+  renderGraph.endFrame();
+  resourceCache.endFrame();
+
+  /* NOT YET
   if (sunLight._shadowMap && !shadowMapPreview) {
     shadowMapPreview = gui.addTexture2D("Shadow Map", sunLight._shadowMap); //TODO
   }
 
+   */
+
   gui.draw();
 
-  window.dispatchEvent(new CustomEvent("screenshot"));
 });
