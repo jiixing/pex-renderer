@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+# [4.0.0](https://github.com/pex-gl/pex-renderer/compare/v4.0.0-alpha.55...v4.0.0) (2024-09-20)
+
+
+
 # [4.0.0-alpha.55](https://github.com/pex-gl/pex-renderer/compare/v4.0.0-alpha.54...v4.0.0-alpha.55) (2024-09-19)
 
 
